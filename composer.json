@@ -1,0 +1,17 @@
+{
+    "name": "chestersa/top-trumps",
+    "description": "A framework for simulating top trumps decks",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Chestersa\\TopTrumps\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Chester Swann-Auger",
+            "email": "chester@hey.com"
+        }
+    ],
+    "require": {}
+}
