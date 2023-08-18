@@ -1,17 +1,17 @@
 {
-    "name": "c16r/top-trumps",
-    "description": "A framework for simulating top trumps decks",
-    "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "C16R\\TopTrumps\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "Chester Swann-Auger",
-            "email": "chester@hey.com"
-        }
-    ],
-    "require": {}
+  "name": "c16r/top-trumps",
+  "description": "A framework for simulating top trumps decks",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "C16R\\TopTrumps\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Chester Swann-Auger",
+      "email": "chester@hey.com"
+    }
+  ],
+  "require": {}
 }
