@@ -1,10 +1,10 @@
 {
-    "name": "chestersa/top-trumps",
+    "name": "c16r/top-trumps",
     "description": "A framework for simulating top trumps decks",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Chestersa\\TopTrumps\\": "src/"
+            "C16R\\TopTrumps\\": "src/"
         }
     },
     "authors": [

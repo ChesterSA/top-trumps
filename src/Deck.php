@@ -1,133 +1,149 @@
 <?php
 
-namespace Chestersa\TopTrumps;
+namespace C16R\TopTrumps;
 
-class Deck
+abstract class Deck
 {
-    protected $name;
-    protected $categories;
-    protected $deck;
+    protected static $name;
+    protected static $categories;
+    protected static $deck;
 
-    public function __construct($name)
-    {
-        $this->name = $name;
+    private static $formatted = false;
+
+    public static function getName(){
+        return static::$name;
     }
 
-    public function getName()
-    {
-        return $this->name;
+    public static function getCategories(){
+        return array_keys(static::$categories);
     }
 
-    public function getCategories($categories)
-    {
-        return $this->categories;
+    public static function getDeck(){
+        return static::$deck;
     }
 
-    public function setCategories($categories)
+    public static function getBestInCategory($category)
     {
-        $this->categories = $categories;
+        self::sortByCategory($category);
+        return static::$deck[0];
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function addCard($name, $stats)
+    public static function sortByCategory($category)
     {
-        $this->resetScores();
+        self::formatDeck();
 
-        if (count($stats) != count($this->categories)) {
-            throw new \Exception('Wrong amount of categories entered');
+        if (in_array($category, array_keys(static::$categories))) {
+            uasort(static::$deck, function ($a, $b) use ($category) {
+                if (static::$categories[$category] == 'inc') {
+                    return $a[$category] < $b[$category];
+                } else {
+                    return $a[$category] > $b[$category];
+                }
+            });
+        };
+    }
+
+    public static function formatDeck()
+    {
+        if (self::$formatted) {
+            return;
         }
 
-        $keyedStats = [];
+        $new = [];
 
-        foreach (array_keys($this->categories) as $key => $category) {
-            $keyedStats[$category] = $stats[$key];
-        }
+        foreach (static::$deck as $name => $stats) {
+            $keyedStats = [];
 
-        $card = new Card($name, $keyedStats);
-
-        $this->deck[] = $card;
-
-        $this->scoreCards();
-    }
-
-    public function getBestInCategory($category)
-    {
-        return $this->sortByCategory($category)[0];
-    }
-
-    public function sortByCategory($category)
-    {
-        $arr = $this->deck;
-
-        $grouped = [];
-
-        foreach ($arr as $card) {
-            $grouped['' . $card->getStat($category)][] = $card;
-        }
-
-
-        if ($this->categories[$category] == 'inc') {
-            krsort($grouped);
-        } elseif ($this->categories[$category] == 'dec') {
-            ksort($grouped);
-        }
-
-        return $grouped;
-    }
-
-    protected function scoreCards()
-    {
-        foreach (array_keys($this->categories) as $category) {
-            $this->scoreDeckByCategory($category);
-        }
-    }
-
-    public function scoreDeckByCategory($category)
-    {
-        $score = count($this->deck);
-
-        $sorted = $this->sortByCategory($category);
-
-        foreach ($sorted as $group) {
-            foreach ($group as $card) {
-                $card->addToScore($score);
+            foreach (array_keys(static::$categories) as $key => $category) {
+                $keyedStats[$category] = $stats[$key];
             }
-            $score -= count($group);
+
+            $new[$name] = $keyedStats;
         }
+
+        static::$deck = $new;
+        self::$formatted = true;
     }
 
-    public function getBestCategoryForCard($name)
+    public static function getWorstInCategory($category)
     {
-        foreach (array_keys($this->categories) as $category) {
-            $this->scoreDeckByCategory($category);
+        self::sortByCategory($category);
+        return end(static::$deck);
+    }
+
+    public static function scoreDeck()
+    {
+        $totals = [];
+        foreach (array_keys(static::$categories) as $category) {
+            $scores = self::scoreByCategory($category);
+
+            foreach ($scores as $name => $score) {
+                if (in_array($name, array_keys($totals))) {
+                    $totals[$name] += $score;
+                } else {
+                    $totals[$name] = $score;
+                }
+            }
         }
+        arsort($totals);
+        return $totals;
     }
 
-    public function getDeck()
+    public static function getBestCategoryForCard($name)
     {
-        return $this->deck;
-    }
+        $maxScore = 0;
+        $bestCategory = '';
 
-    public function getSortedDeck()
-    {
-        $arr = $this->getDeck();
+        foreach (array_keys(static::$categories) as $category) {
+            $scores = self::scoreByCategory($category);
 
-        usort($arr, function ($a, $b) {
-            return $a->getScore() < $b->getScore();
-        });
-
-        return $arr;
-    }
-
-    private function resetScores()
-    {
-        if($this->deck != null){
-            foreach($this->deck as $card){
-                $card->resetScore();
+            if ($scores[$name] > $maxScore) {
+                $maxScore = $scores[$name];
+                $bestCategory = $category;
             }
         }
 
+        return $bestCategory;
     }
+
+    public static function getWorstCategoryForCard($name)
+    {
+        $minScore = 100000;
+        $worstCategory = '';
+
+        foreach (array_keys(static::$categories) as $category) {
+            $scores = self::scoreByCategory($category);
+
+            if ($scores[$name] < $minScore) {
+                $minScore = $scores[$name];
+                $worstCategory = $category;
+            }
+        }
+
+        return $worstCategory;
+    }
+
+    public static function scoreByCategory($category)
+    {
+        $scored = [];
+        $score = count(static::$deck);
+
+        self::sortByCategory($category);
+
+        foreach (static::$deck as $name => $card) {
+            $card['score'] = $score;
+            $scored[$name] = $score;
+
+            $score--;
+        }
+        return $scored;
+    }
+
+    public static function scoreCardByCategory($card, $category)
+    {
+        $scores = self::scoreByCategory($category);
+        return $scores[$card];
+    }
+
+
 }
