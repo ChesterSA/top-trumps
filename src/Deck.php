@@ -10,15 +10,18 @@ abstract class Deck
 
     private static $formatted = false;
 
-    public static function getName(){
+    public static function getName()
+    {
         return static::$name;
     }
 
-    public static function getCategories(){
+    public static function getCategories()
+    {
         return array_keys(static::$categories);
     }
 
-    public static function getDeck(){
+    public static function getDeck()
+    {
         return static::$deck;
     }
 
@@ -89,6 +92,22 @@ abstract class Deck
         return $totals;
     }
 
+    public static function scoreByCategory($category)
+    {
+        $scored = [];
+        $score = count(static::$deck);
+
+        self::sortByCategory($category);
+
+        foreach (static::$deck as $name => $card) {
+            $card['score'] = $score;
+            $scored[$name] = $score;
+
+            $score--;
+        }
+        return $scored;
+    }
+
     public static function getBestCategoryForCard($name)
     {
         $maxScore = 0;
@@ -121,22 +140,6 @@ abstract class Deck
         }
 
         return $worstCategory;
-    }
-
-    public static function scoreByCategory($category)
-    {
-        $scored = [];
-        $score = count(static::$deck);
-
-        self::sortByCategory($category);
-
-        foreach (static::$deck as $name => $card) {
-            $card['score'] = $score;
-            $scored[$name] = $score;
-
-            $score--;
-        }
-        return $scored;
     }
 
     public static function scoreCardByCategory($card, $category)

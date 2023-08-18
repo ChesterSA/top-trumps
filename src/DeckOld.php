@@ -52,29 +52,13 @@ class DeckOld
         $this->scoreCards();
     }
 
-    public function getBestInCategory($category)
+    private function resetScores()
     {
-        return $this->sortByCategory($category)[0];
-    }
-
-    public function sortByCategory($category)
-    {
-        $arr = $this->deck;
-
-        $grouped = [];
-
-        foreach ($arr as $card) {
-            $grouped['' . $card->getStat($category)][] = $card;
+        if ($this->deck != null) {
+            foreach ($this->deck as $card) {
+                $card->resetScore();
+            }
         }
-
-
-        if ($this->categories[$category] == 'inc') {
-            krsort($grouped);
-        } elseif ($this->categories[$category] == 'dec') {
-            ksort($grouped);
-        }
-
-        return $grouped;
     }
 
     protected function scoreCards()
@@ -98,16 +82,36 @@ class DeckOld
         }
     }
 
+    public function sortByCategory($category)
+    {
+        $arr = $this->deck;
+
+        $grouped = [];
+
+        foreach ($arr as $card) {
+            $grouped['' . $card->getStat($category)][] = $card;
+        }
+
+
+        if ($this->categories[$category] == 'inc') {
+            krsort($grouped);
+        } elseif ($this->categories[$category] == 'dec') {
+            ksort($grouped);
+        }
+
+        return $grouped;
+    }
+
+    public function getBestInCategory($category)
+    {
+        return $this->sortByCategory($category)[0];
+    }
+
     public function getBestCategoryForCard($name)
     {
         foreach (array_keys($this->categories) as $category) {
             $this->scoreDeckByCategory($category);
         }
-    }
-
-    public function getDeck()
-    {
-        return $this->deck;
     }
 
     public function getSortedDeck()
@@ -121,13 +125,8 @@ class DeckOld
         return $arr;
     }
 
-    private function resetScores()
+    public function getDeck()
     {
-        if($this->deck != null){
-            foreach($this->deck as $card){
-                $card->resetScore();
-            }
-        }
-
+        return $this->deck;
     }
 }
